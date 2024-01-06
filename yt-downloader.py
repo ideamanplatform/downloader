@@ -1,8 +1,10 @@
 import os
+import datetime
 import subprocess
 
 def get_output_dir():
-    output_dir = os.path.join(os.getcwd(), "downloads/yt-dlp/")
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    output_dir = os.path.join(os.getcwd(), f"download_{timestamp}/")
     
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -12,10 +14,11 @@ def get_output_dir():
 
 def build_command(url, is_playlist, audio_only):
     output_dir = get_output_dir()
-    format_options = "--format bestaudio --extract-audio --audio-format mp3" if audio_only else "--format mp4"
+    format_options = "--format bestaudio --extract-audio --audio-format mp3" if audio_only else ""
     playlist_option = "--yes-playlist" if is_playlist else ""
+    file = f"{output_dir}%(title)s" if audio_only else f"{output_dir}%(title)s.%(ext)s"
     
-    return f'yt-dlp {format_options} {playlist_option} -o {output_dir}%(title)s {url}'
+    return f'yt-dlp {format_options} {playlist_option} -o {file} {url}'
 
 def run_command(command):
     try:
